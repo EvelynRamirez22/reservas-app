@@ -8,13 +8,19 @@ const App = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/pais");
-      setItems(response.data);
+      const response = await fetch("http://127.0.0.1:5000/api/pais"); // Cambia aquí para usar query
+      if (!response.ok) {
+        throw new Error("Error al obtener los ítems");
+      }
+      const data = await response.json();
+      setItems(data);
     } catch (error) {
       console.error("Error al obtener los items:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchItems();
   }, []);
@@ -26,9 +32,15 @@ const App = () => {
   return (
     <div>
       <h1>Lista de Items</h1>
-      {/* Aquí podrías renderizar tus items */}
+      <ItemForm fetchItems={fetchItems} /> {/* Renderiza el componente aquí */}
+      {/* Renderiza la lista de ítems */}
+      {items ? <ul>
+        {items.map((item, index) => (
+          <li key={index}>{item.Nombre}</li> // Asegúrate de que `item.name` sea la propiedad correcta
+        ))}
+      </ul> : <>cargando...</>}
+      
     </div>
   );
-};
-
+}
 export default App;
